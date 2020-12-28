@@ -7,9 +7,9 @@ class Task {
   Task({this.taskId, this.taskName, this.isComplete});
   toJson() {
     return {
-      DbHalper.taskIdColumnName: this.taskId,
+      DbHalper.idColumnName: this.taskId,
       DbHalper.taskNameColumnName: this.taskName,
-      DbHalper.taskIsCompleteColumnName: this.isComplete ? 1 : 0
+      DbHalper.isCompleteColumnName: this.isComplete ? 1 : 0
     };
   }
 

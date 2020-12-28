@@ -184,7 +184,6 @@ class _CompleteTasksState extends State<CompleteTasks> {
     return Scaffold(
         body: FutureBuilder<List>(
       future: DbHalper.dbHalper.selectSpecificTasks(1),
-      initialData: List(),
       builder: (context, snap) {
         if (snap.hasData) {
           return ListView.builder(
@@ -263,7 +262,7 @@ class _CompleteTasksState extends State<CompleteTasks> {
           );
         }
 
-        return CircularProgressIndicator();
+        return Center(child: CircularProgressIndicator());
       },
     ));
   }
@@ -356,7 +355,7 @@ class _InCompleteTasksState extends State<InCompleteTasks> {
             },
           );
         }
-        return CircularProgressIndicator();
+        return Center(child: CircularProgressIndicator());
       },
     ));
   }
