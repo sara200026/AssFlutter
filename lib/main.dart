@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lec2/taskWidget.dart';
 
 import 'db_helper.dart';
 import 'newTask.dart';
@@ -91,83 +92,89 @@ class _AllTasksState extends State<AllTasks> {
         body: FutureBuilder(
       future: DbHalper.dbHalper.selectAllTasks(),
       builder: (context, snap) {
-        if (snap.hasData) {
-          return ListView.builder(
-            itemCount: snap.data.length,
-            itemBuilder: (context, position) {
-              bool isComplete = false;
-              int index = snap.data[position].row[2];
+        return snap.hasData
+            ? ListView.builder(
+                itemCount: snap.data.length,
+                itemBuilder: (_, position) {
+                  bool isComplete = false;
+                  int index = snap.data[position].row[2];
 
-              if (index == 1) {
-                isComplete = true;
-              } else {
-                isComplete = false;
-              }
-              return Card(
-                  margin: EdgeInsets.all(10),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              AlertDialog alertDialog = AlertDialog(
-                                title: Text("AlertDialog"),
-                                content: Text("are you sure to delete Task?"),
-                                actions: [
-                                  FlatButton(
-                                    child: Text("Yes"),
-                                    onPressed: () {
-                                      DbHalper.dbHalper.deleteTask(
-                                          snap.data[position].row[0]);
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TabBarPage()),
-                                          (Route<dynamic> route) => false);
+                  if (index == 1) {
+                    isComplete = true;
+                  } else {
+                    isComplete = false;
+                  }
+                  // return TaskWidget(Task(
+                  //     taskName: snap.data[position].row[1],
+                  //     isComplete: isComplete));
+                  return Card(
+                      margin: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  AlertDialog alertDialog = AlertDialog(
+                                    title: Text("AlertDialog"),
+                                    content:
+                                        Text("are you sure to delete Task?"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text("Yes"),
+                                        onPressed: () {
+                                          DbHalper.dbHalper.deleteTask(
+                                              snap.data[position].row[0]);
+                                          // Navigator.pop(context);
+
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TabBarPage()),
+                                          );
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alertDialog;
                                     },
-                                  ),
-                                  FlatButton(
-                                    child: Text("No"),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return alertDialog;
-                                },
-                              );
-                            });
-                          },
-                          child: Icon(
-                            Icons.delete,
-                          ),
+                                  );
+                                });
+                              },
+                              child: Icon(
+                                Icons.delete,
+                              ),
+                            ),
+                            Text(snap.data[position].row[1]),
+                            Checkbox(
+                                value: isComplete,
+                                onChanged: (value) {
+                                  setState(() {
+                                    DbHalper.dbHalper.updateTask(Task(
+                                      taskId: snap.data[position].row[0],
+                                      taskName: snap.data[position].row[1],
+                                      isComplete: value,
+                                    ));
+                                  });
+                                }),
+                          ],
                         ),
-                        Text(snap.data[position].row[1]),
-                        Checkbox(
-                            value: isComplete,
-                            onChanged: (value) {
-                              setState(() {
-                                DbHalper.dbHalper.updateTask(Task(
-                                  taskId: snap.data[position].row[0],
-                                  taskName: snap.data[position].row[1],
-                                  isComplete: value,
-                                ));
-                              });
-                            }),
-                      ],
-                    ),
-                  ));
-            },
-          );
-        }
-        return CircularProgressIndicator();
+                      ));
+                },
+              )
+            : Center(child: CircularProgressIndicator());
       },
     ));
   }
@@ -185,84 +192,87 @@ class _CompleteTasksState extends State<CompleteTasks> {
         body: FutureBuilder<List>(
       future: DbHalper.dbHalper.selectSpecificTasks(1),
       builder: (context, snap) {
-        if (snap.hasData) {
-          return ListView.builder(
-            itemCount: snap.data.length,
-            itemBuilder: (context, position) {
-              bool isComplete = false;
+        return snap.hasData
+            ? ListView.builder(
+                itemCount: snap.data.length,
+                itemBuilder: (context, position) {
+                  bool isComplete = false;
 
-              int index = snap.data[position].row[2];
-              if (index == 1) {
-                isComplete = true;
-              } else {
-                isComplete = false;
-              }
-              return Card(
-                  margin: EdgeInsets.all(10),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              AlertDialog alert = AlertDialog(
-                                title: Text("AlertDialog"),
-                                content: Text("are you sure to delte Task?"),
-                                actions: [
-                                  FlatButton(
-                                    child: Text("Yes"),
-                                    onPressed: () {
-                                      DbHalper.dbHalper.deleteTask(
-                                          snap.data[position].row[0]);
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TabBarPage()),
-                                          (Route<dynamic> route) => false);
+                  int index = snap.data[position].row[2];
+                  if (index == 1) {
+                    isComplete = true;
+                  } else {
+                    isComplete = false;
+                  }
+                  // return TaskWidget(Task(
+                  //     taskName: snap.data[position].row[1],
+                  //     isComplete: isComplete));
+                  return Card(
+                      margin: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  AlertDialog alert = AlertDialog(
+                                    title: Text("AlertDialog"),
+                                    content:
+                                        Text("are you sure to delte Task?"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text("Yes"),
+                                        onPressed: () {
+                                          DbHalper.dbHalper.deleteTask(
+                                              snap.data[position].row[0]);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TabBarPage()),
+                                          );
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alert;
                                     },
-                                  ),
-                                  FlatButton(
-                                    child: Text("No"),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return alert;
-                                },
-                              );
-                            });
-                          },
-                          child: Icon(
-                            Icons.delete,
-                          ),
+                                  );
+                                });
+                              },
+                              child: Icon(
+                                Icons.delete,
+                              ),
+                            ),
+                            Text(snap.data[position].row[1]),
+                            Checkbox(
+                                value: isComplete,
+                                onChanged: (value) {
+                                  setState(() {
+                                    DbHalper.dbHalper.updateTask(Task(
+                                      taskId: snap.data[position].row[0],
+                                      taskName: snap.data[position].row[1],
+                                      isComplete: value,
+                                    ));
+                                  });
+                                }),
+                          ],
                         ),
-                        Text(snap.data[position].row[1]),
-                        Checkbox(
-                            value: isComplete,
-                            onChanged: (value) {
-                              setState(() {
-                                DbHalper.dbHalper.updateTask(Task(
-                                  taskId: snap.data[position].row[0],
-                                  taskName: snap.data[position].row[1],
-                                  isComplete: value,
-                                ));
-                              });
-                            }),
-                      ],
-                    ),
-                  ));
-            },
-          );
-        }
-
-        return Center(child: CircularProgressIndicator());
+                      ));
+                },
+              )
+            : Center(child: CircularProgressIndicator());
       },
     ));
   }
@@ -280,82 +290,86 @@ class _InCompleteTasksState extends State<InCompleteTasks> {
         body: FutureBuilder(
       future: DbHalper.dbHalper.selectSpecificTasks(0),
       builder: (context, snap) {
-        if (snap.hasData) {
-          return ListView.builder(
-            itemCount: snap.data.length,
-            itemBuilder: (context, position) {
-              bool isComplete = false;
-              int index = snap.data[position].row[2];
-              if (index == 1) {
-                isComplete = true;
-              } else {
-                isComplete = false;
-              }
-              return Card(
-                  margin: EdgeInsets.all(10),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              AlertDialog alertDialog = AlertDialog(
-                                title: Text("AlertDialog"),
-                                content: Text("are you sure to delete Task?"),
-                                actions: [
-                                  FlatButton(
-                                    child: Text("Yes"),
-                                    onPressed: () {
-                                      DbHalper.dbHalper.deleteTask(
-                                          snap.data[position].row[0]);
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  TabBarPage()),
-                                          (Route<dynamic> route) => false);
+        return snap.hasData
+            ? ListView.builder(
+                itemCount: snap.data.length,
+                itemBuilder: (context, position) {
+                  bool isComplete = false;
+                  int index = snap.data[position].row[2];
+                  if (index == 1) {
+                    isComplete = true;
+                  } else {
+                    isComplete = false;
+                  }
+                  // return TaskWidget(Task(
+                  // taskName: snap.data[position].row[1],
+                  // isComplete: isComplete));
+                  return Card(
+                      margin: EdgeInsets.all(10),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  AlertDialog alertDialog = AlertDialog(
+                                    title: Text("AlertDialog"),
+                                    content:
+                                        Text("are you sure to delete Task?"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text("Yes"),
+                                        onPressed: () {
+                                          DbHalper.dbHalper.deleteTask(
+                                              snap.data[position].row[0]);
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    TabBarPage()),
+                                          );
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text("No"),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return alertDialog;
                                     },
-                                  ),
-                                  FlatButton(
-                                    child: Text("No"),
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                  ),
-                                ],
-                              );
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return alertDialog;
-                                },
-                              );
-                            });
-                          },
-                          child: Icon(
-                            Icons.delete,
-                          ),
+                                  );
+                                });
+                              },
+                              child: Icon(
+                                Icons.delete,
+                              ),
+                            ),
+                            Text(snap.data[position].row[1]),
+                            Checkbox(
+                                value: isComplete,
+                                onChanged: (value) {
+                                  setState(() {
+                                    DbHalper.dbHalper.updateTask(Task(
+                                      taskId: snap.data[position].row[0],
+                                      taskName: snap.data[position].row[1],
+                                      isComplete: value,
+                                    ));
+                                  });
+                                }),
+                          ],
                         ),
-                        Text(snap.data[position].row[1]),
-                        Checkbox(
-                            value: isComplete,
-                            onChanged: (value) {
-                              setState(() {
-                                DbHalper.dbHalper.updateTask(Task(
-                                  taskId: snap.data[position].row[0],
-                                  taskName: snap.data[position].row[1],
-                                  isComplete: value,
-                                ));
-                              });
-                            }),
-                      ],
-                    ),
-                  ));
-            },
-          );
-        }
-        return Center(child: CircularProgressIndicator());
+                      ));
+                },
+              )
+            : Center(child: CircularProgressIndicator());
       },
     ));
   }
